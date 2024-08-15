@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Web App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            color: rgb(255, 136, 34);
+            background: rgb(255, 255, 255);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 18px;
+            height: 100vh;
+            margin: 0;
+            position: relative;
+        }
+        .header {
+            align-self: flex-start;
+            margin: 10px;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            justify-content: space-between;
+        }
+        .center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px; /* Adjust height as needed */
+        }
+        .buttons, .page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .custom-btn {
+            position: relative;
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 18px;
+            color: rgb(255, 255, 255);
+            text-align: center;
+            text-decoration: none;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            z-index: 1;
+            border-radius: 5px;
+            margin: 10px 0;
+            width: 200px;
+            border: none;
+        }
+        .btn-14 {
+            background: rgb(255,151,0);
+            z-index: 1;
+        }
+        .btn-14:after {
+            position: absolute;
+            content: "";
+            width: 100%;
+            height: 0;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            border-radius: 5px;
+            background-color: #eaf818;
+            background-image: linear-gradient(315deg, #eaf818 0%, #f6fc9c 74%);
+            box-shadow: inset 2px 2px 2px 0px rgba(255,255,255,.5),
+                        7px 7px 20px 0px rgba(0,0,0,.1),
+                        4px 4px 5px 0px rgba(0,0,0,.1);
+            transition: all 0.3s ease;
+        }
+        .btn-14:hover {
+            color: #000;
+        }
+        .btn-14:hover:after {
+            top: auto;
+            bottom: 0;
+            height: 100%;
+        }
+        .btn-14:active {
+            top: 2px;
+        }
+        .icon-button {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: rgb(255, 136, 34);
+            margin: 10px;
+        }
+        .hidden {
+            display: none;
+        }
+        .page-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            width: 100%;
+        }
+        .page-content div.title {
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        #container {
+            display: none;
+            position: relative;
+            margin: auto;
+            overflow: hidden;
+            width: 700px;
+            height: 250px;
+        }
+        .dot, .button-box {
+            cursor: pointer;
+        }
+        #success-box, #error-box {
+            position: absolute;
+            width: 35%;
+            height: 100%;
+            background: linear-gradient(to bottom right, #B0DB7D 40%, #99DBB4 100%);
+            border-radius: 20px;
+            box-shadow: 5px 5px 20px rgba(203, 205, 211, 10%);
+            perspective: 40px;
+            display: none;
+        }
+        #error-box {
+            background: linear-gradient(to bottom left, #EF8D9C 40%, #FFC39E 100%);
+        }
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #FCFCFC;
+            border-radius: 50%;
+            position: absolute;
+            top: 4%;
+            right: 6%;
+        }
+        .two {
+            right: 12%;
+            opacity: .5;
+        }
+        .face, .face2 {
+            position: absolute;
+            width: 22%;
+            height: 22%;
+            background: #FCFCFC;
+            border-radius: 50%;
+            border: 1px solid #777777;
+            top: 21%;
+            left: 37.5%;
+            z-index: 2;
+        }
+        .face2 {
+            animation: roll 3s ease-in-out infinite;
+        }
+        .eye {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: #777777;
+            border-radius: 50%;
+            top: 40%;
+            left: 20%;
+        }
+        .right {
+            left: 68%;
+        }
+        .mouth {
+            position: absolute;
+            top: 43%;
+            left: 41%;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+        }
+        .happy {
+            border: 2px solid;
+            border-color: transparent #777777 #777777 transparent;
+            transform: rotate(45deg);
+        }
+        .sad {
+            top: 49%;
+            border: 2px solid;
+            border-color: #777777 transparent transparent #777777;
+            transform: rotate(45deg);
+        }
+        .shadow {
+            position: absolute;
+            width: 21%;
+            height: 3%;
+            opacity: .5;
+            background: #777777;
+            left: 40%;
+            top: 43%;
+            border-radius: 50%;
+            z-index: 1;
+        }
+        .scale {
+            animation: scale 1s ease-in infinite;
+        }
+        .move {
+            animation: move 3s ease-in-out infinite;
+        }
+        .message {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            height: 40%;
+            top: 47%;
+        }
+        .button-box {
+            position: absolute;
+            background: #FCFCFC;
+            width: 50%;
+            height: 15%;
+            border-radius: 20px;
+            top: 73%;
+            left: 25%;
+            outline: 0;
+            border: none;
+            box-shadow: 2px 2px 10px rgba(119, 119, 119, .5);
+            transition: all .5s ease-in-out;
+        }
+        .button-box:hover {
+            background: darken(#FCFCFC, 5%);
+            transform: scale(1.05);
+            transition: all .3s ease-in-out;
+        }
+        @keyframes scale {
+            50% {
+                transform: scale(0.9);
+            }
+        }
+        @keyframes roll {
+            0% {
+                transform: rotate(0deg);
+                left: 25%;
+            }
+            50% {
+                left: 60%;
+                transform: rotate(168deg);
+            }
+            100% {
+                transform: rotate(0deg);
+                left: 25%;
+            }
+        }
+        @keyframes move {
+            0% {
+                left: 25%;
+            }
+            50% {
+                left: 60%;
+            }
+            100% {
+                left: 25%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header" id="userInfo">
+        <span id="username"></span>
+        <button id="myQuestionsButton" class="icon-button">📩</button>
+    </div>
+    <div class="center" id="logo">
+        <img src="/static/App_icon.png" alt="App Icon" style="height: 100%; max-height: 100px;">
+    </div>
+    <div class="buttons" id="mainButtons">
+        <button id="askQuestionButton" class="custom-btn btn-14">✏️ Написать вопрос</button>
+        <button id="profileButton" class="custom-btn btn-14">👤 Личный кабинет</button>
+        <button id="donateButton" class="custom-btn btn-14">🙏🏼 Пожертвовать проекту</button>
+    </div>
+    <div class="page hidden" id="askQuestionPage">
+        <div>Задайте ваш вопрос:</div>
+            <input type="text" id="requestSubject" name="subject" placeholder="Тема запроса" required>
+            <textarea id="questionText" name="question" rows="4" cols="50" placeholder="Сообщение" required></textarea>
+            <input type="file" id="fileInput" name="file">
+            <button type="button" id="submitQuestionButton" class="custom-btn btn-14">Отправить</button>
+    </div>
+    <div class="page hidden" id="profilePage">
+        <div class="page-content">
+            <div>Личный кабинет:</div>
+            <button id="projectSiteButton" class="custom-btn btn-14">Сайт проекта</button>
+            <button id="telegramGroupButton" class="custom-btn btn-14">Наша группа в Телеграм</button>
+            <button id="userAgreementButton" class="custom-btn btn-14">Пользовательское соглашение</button>
+            <button id="backButton2" class="custom-btn btn-14">Назад</button>
+        </div>
+    </div>
+    <div class="page hidden" id="donatePage">
+        <div>Пожертвовать:</div>
+        <input type="number" id="donationAmount" placeholder="Введите сумму">
+        <button id="submitDonationButton" class="custom-btn btn-14">Пожертвовать</button>
+        <button id="backButton3" class="custom-btn btn-14">Назад</button>
+    </div>
+    <div class="page hidden" id="questionsPage">
+        <div class="page-content" id="questionsList">
+            <div>Ваши вопросы:</div>
+        </div>
+        <button id="backButton4" class="custom-btn btn-14">Назад</button>
+    </div>
+    <div class="page hidden" id="emptyPage">
+        <div class="page-content">
+            <div class="title">Ваши вопросы к ветеринарам</div>
+            <button id="backButtonEmptyPage" class="custom-btn btn-14">Назад</button>
+        </div>
+    </div>
+
+    <div id="container">
+        <div id="success-box">
+            <div class="dot"></div>
+            <div class="dot two"></div>
+            <div class="face">
+                <div class="eye"></div>
+                <div class="eye right"></div>
+                <div class="mouth happy"></div>
+            </div>
+            <div class="shadow scale"></div>
+            <div class="message"><h1 class="alert">Success!</h1><p>Ваш вопрос успешно отправлен ветеринарам.</p></div>
+            <button id="continueButton" class="button-box"><h1 class="green">continue</h1></button>
+        </div>
+        <div id="error-box">
+            <div class="dot"></div>
+            <div class="dot two"></div>
+            <div class="face2">
+                <div class="eye"></div>
+                <div class="eye right"></div>
+                <div class="mouth sad"></div>
+            </div>
+            <div class="shadow move"></div>
+            <div class="message"><h1 class="alert">Error!</h1><p>Произошла ошибка при отправке вопроса.</p></div>
+            <button id="tryAgainButton" class="button-box"><h1 class="red">try again</h1></button>
+        </div>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+
+        tg.expand();
+
+        function showMainButtons() {
+            document.getElementById('mainButtons').classList.remove('hidden');
+            document.querySelectorAll('.page').forEach(page => page.classList.add('hidden'));
+            document.getElementById('container').style.display = 'none';
+            document.getElementById('success-box').style.display = 'none';
+            document.getElementById('error-box').style.display = 'none';
+        }
+
+        function showPage(pageId) {
+            document.getElementById('mainButtons').classList.add('hidden');
+            document.getElementById(pageId).classList.remove('hidden');
+        }
+
+        const askQuestionButton = document.getElementById('askQuestionButton');
+        const profileButton = document.getElementById('profileButton');
+        const donateButton = document.getElementById('donateButton');
+
+        askQuestionButton.addEventListener('click', function() {
+            showPage('askQuestionPage');
+        });
+
+        profileButton.addEventListener('click', function() {
+            showPage('profilePage');
+        });
+
+        donateButton.addEventListener('click', function() {
+            showPage('donatePage');
+        });
+
+        document.getElementById('submitQuestionButton').addEventListener('click', function(event) {
+        const subject = document.getElementById('requestSubject').value.trim();
+        const question = document.getElementById('questionText').value.trim();
+        const fileInput = document.getElementById('fileInput').files[0];
+
+        if (!subject || !question) {
+            alert('Пожалуйста, заполните тему запроса и сообщение.');
+            return;
+        }
+
+        const formData = new FormData();
+        if (fileInput) {
+            formData.append('file', fileInput);
+        }
+
+        // Отправка файла на сервер
+        fetch('https://29f3-212-116-96-98.ngrok-free.app/upload_file', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('File upload response:', data);
+            document.getElementById('responseMessage').textContent = data.message;
+        })
+        .catch(error => {
+            console.error('Error uploading file:', error);
+            document.getElementById('responseMessage').textContent = 'Error uploading file.';
+        });
+
+        // Отправка темы и вопроса через Telegram Web App API
+        tg.sendData(JSON.stringify({ action: "ask_question", subject: subject, question: question }));
+        });
+
+
+
+        tg.onEvent('web_app_data', function(data) {
+            const parsedData = JSON.parse(data);
+            if (parsedData) {
+                if (parsedData.action === "question_received" && parsedData.status === "success") {
+                    document.getElementById('askQuestionPage').classList.add('hidden');
+                    document.getElementById('success-box').style.display = 'block';
+                    document.getElementById('container').style.display = 'block';
+                    showMainButtons();
+                } else if (parsedData.action === "question_error" && parsedData.status === "error") {
+                    document.getElementById('askQuestionPage').classList.add('hidden');
+                    document.getElementById('error-box').style.display = 'block';
+                    document.getElementById('container').style.display = 'block';
+                }
+            }
+        });
+
+        const continueButton = document.getElementById('continueButton');
+        const tryAgainButton = document.getElementById('tryAgainButton');
+        continueButton.addEventListener('click', function() {
+            showMainButtons();
+        });
+
+        tryAgainButton.addEventListener('click', function() {
+            showPage('askQuestionPage');
+        });
+
+        const backButton1 = document.getElementById('backButton1');
+        const backButton2 = document.getElementById('backButton2');
+        const backButton3 = document.getElementById('backButton3');
+        const backButton4 = document.getElementById('backButton4');
+        const backButtonEmptyPage = document.getElementById('backButtonEmptyPage');
+
+        backButton1.addEventListener('click', showMainButtons);
+        backButton2.addEventListener('click', showMainButtons);
+        backButton3.addEventListener('click', showMainButtons);
+        backButton4.addEventListener('click', showMainButtons);
+        backButtonEmptyPage.addEventListener('click', showMainButtons);
+    </script>
+</body>
+</html>
