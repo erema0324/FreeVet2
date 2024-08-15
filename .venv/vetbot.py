@@ -5,6 +5,7 @@ from telebot import types
 import json
 import sqlite3
 from sql import save_user, get_user, save_question, get_user_questions, init_db
+import time
 
 
 API_TOKEN = '7214821564:AAGbG3JJyObd3cF8UNbMNibGSIxz_QMiZTU'
@@ -19,7 +20,7 @@ def webAppKeyboard(user_data):
     username, first_name, last_name = user_data
     keyboard = types.ReplyKeyboardMarkup(row_width=1)
     webAppTest = types.WebAppInfo(
-        f"https://29f3-212-116-96-98.ngrok-free.app/webapp.html?username={username}&first_name={first_name}&last_name={last_name}")
+        f"https://cadb-212-116-96-98.ngrok-free.app/webapp.html?username={username}&first_name={first_name}&last_name={last_name}")
     one_butt = types.KeyboardButton(text="Open Web App", web_app=webAppTest)
     keyboard.add(one_butt)
     return keyboard
@@ -54,6 +55,7 @@ def answer(webAppMes):
 
 
     data = webAppMes.web_app_data.data
+    print(data)
 
     if data:
         try:
@@ -103,5 +105,7 @@ def answer(webAppMes):
 
 
 if __name__ == "__main__":
-    init_db()
-    bot.infinity_polling()
+    while True:
+        bot.infinity_polling()
+        time.sleep(10)
+

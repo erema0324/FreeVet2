@@ -284,6 +284,7 @@
             <textarea id="questionText" name="question" rows="4" cols="50" placeholder="Сообщение" required></textarea>
             <input type="file" id="fileInput" name="file">
             <button type="button" id="submitQuestionButton" class="custom-btn btn-14">Отправить</button>
+            <button id="backButton2" class="custom-btn btn-14">Назад</button>
     </div>
     <div class="page hidden" id="profilePage">
         <div class="page-content">
@@ -387,10 +388,11 @@
         const formData = new FormData();
         if (fileInput) {
             formData.append('file', fileInput);
+
         }
 
         // Отправка файла на сервер
-        fetch('https://29f3-212-116-96-98.ngrok-free.app/upload_file', {
+        fetch('https://cadb-212-116-96-98.ngrok-free.app/upload_file', {
             method: 'POST',
             body: formData
         })
@@ -406,6 +408,7 @@
 
         // Отправка темы и вопроса через Telegram Web App API
         tg.sendData(JSON.stringify({ action: "ask_question", subject: subject, question: question }));
+
 
         });
 
