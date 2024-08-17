@@ -7,13 +7,14 @@ from sql import save_file_to_db, init_db
 app = Flask(__name__)
 CORS(app)
 
+
 @app.route('/webapp.html')
 def render_templ():
     return render_template('webapp.html')
 
+
 @app.route('/upload_file', methods=['POST'])
 def upload_file():
-
     upload_folder = 'uploads'
     if 'file' not in request.files:
         return jsonify({"status": "error", "message": "No file part"}), 400
@@ -23,8 +24,8 @@ def upload_file():
     if file is None or file.filename == '':
         return jsonify({"status": "error", "message": "No selected file"}), 400
 
-
-    file_path = os.path.join( upload_folder, file.filename)
+    file_path = os.path.join(upload_folder, file.filename)
+    print(file_path)
 
     try:
         # file.save(file_path)

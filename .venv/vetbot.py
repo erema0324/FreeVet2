@@ -7,7 +7,6 @@ import sqlite3
 from sql import save_user, get_user, save_question, get_user_questions, init_db
 import time
 
-
 API_TOKEN = '7214821564:AAGbG3JJyObd3cF8UNbMNibGSIxz_QMiZTU'
 
 logging.basicConfig(level=logging.INFO)
@@ -20,7 +19,7 @@ def webAppKeyboard(user_data):
     username, first_name, last_name = user_data
     keyboard = types.ReplyKeyboardMarkup(row_width=1)
     webAppTest = types.WebAppInfo(
-        f"https://cadb-212-116-96-98.ngrok-free.app/webapp.html?username={username}&first_name={first_name}&last_name={last_name}")
+        f"https://0fe4-212-116-96-98.ngrok-free.app/webapp.html?username={username}&first_name={first_name}&last_name={last_name}")
     one_butt = types.KeyboardButton(text="Open Web App", web_app=webAppTest)
     keyboard.add(one_butt)
     return keyboard
@@ -53,7 +52,6 @@ def answer(webAppMes):
     logger.info(f"Full message: {webAppMes}")
     logger.info(f"Data from web app: {webAppMes.web_app_data.data}")
 
-
     data = webAppMes.web_app_data.data
     print(data)
 
@@ -68,12 +66,11 @@ def answer(webAppMes):
                 subject = event_data.get("subject")
                 question = event_data.get("question")
 
-
                 try:
                     save_question(user_id, subject, question)
                     if query_id:
                         bot.answer_web_app_query(query_id,
-                                                 json.dumps({"action": "question_received", "status": "success"}))
+                        json.dumps({"action": "question_received", "status": "success"}))
                     bot.send_message(user_id, "Ваш вопрос успешно отправлен ветеринарному врачу.")
 
                 except Exception as e:
@@ -81,7 +78,7 @@ def answer(webAppMes):
                         bot.answer_web_app_query(query_id, json.dumps({"action": "question_error", "status": "error"}))
                     logger.error(f"Error saving question: {e}")
                     bot.send_message(user_id,
-                                     "Произошла ошибка при отправке вашего вопроса. Пожалуйста, попробуйте еще раз.")
+                    "Произошла ошибка при отправке вашего вопроса. Пожалуйста, попробуйте еще раз.")
 
             elif event == "get_my_questions":
                 try:
@@ -105,7 +102,4 @@ def answer(webAppMes):
 
 
 if __name__ == "__main__":
-    while True:
-        bot.infinity_polling()
-        time.sleep(10)
-
+    bot.infinity_polling()

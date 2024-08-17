@@ -282,9 +282,9 @@
         <div>Задайте ваш вопрос:</div>
             <input type="text" id="requestSubject" name="subject" placeholder="Тема запроса" required>
             <textarea id="questionText" name="question" rows="4" cols="50" placeholder="Сообщение" required></textarea>
-            <input type="file" id="fileInput" name="file">
+            <input type="file" id="fileInput" name="file" multiple>
             <button type="button" id="submitQuestionButton" class="custom-btn btn-14">Отправить</button>
-            <button id="backButton2" class="custom-btn btn-14">Назад</button>
+            <button id="backButton1" class="custom-btn btn-14">Назад</button>
     </div>
     <div class="page hidden" id="profilePage">
         <div class="page-content">
@@ -342,9 +342,11 @@
     </div>
 
     <script>
+
         let tg = window.Telegram.WebApp;
 
         tg.expand();
+
 
         function showMainButtons() {
             document.getElementById('mainButtons').classList.remove('hidden');
@@ -380,39 +382,44 @@
         const question = document.getElementById('questionText').value.trim();
         const fileInput = document.getElementById('fileInput').files[0];
 
+
+
         if (!subject || !question) {
-            alert('Пожалуйста, заполните тему запроса и сообщение.');
-            return;
+        alert('Пожалуйста, заполните тему запроса и сообщение.');
+        return;
         }
+
 
         const formData = new FormData();
+
         if (fileInput) {
             formData.append('file', fileInput);
-
         }
 
+
         // Отправка файла на сервер
-        fetch('https://cadb-212-116-96-98.ngrok-free.app/upload_file', {
+         fetch('https://0fe4-212-116-96-98.ngrok-free.app/upload_file', {
             method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('File upload response:', data);
-            document.getElementById('responseMessage').textContent = data.message;
-        })
-        .catch(error => {
-            console.error('Error uploading file:', error);
-            document.getElementById('responseMessage').textContent = 'Error uploading file.';
+            body: formData,
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error(`Ошибка сети: ${response.status} ${response.statusText}`);
+              }
+              return response.json();
+            })
+            .then(data => {
+              console.log('File upload response:', data);
+              document.getElementById('responseMessage').textContent = data.message || 'File uploaded successfully!';
+            })
+            .catch(error => {
+              console.error('Error uploading file:', error);
+              document.getElementById('responseMessage').textContent = 'Error uploading file.';
+            });
+
+            // Отправка темы и вопроса через Telegram Web App API
+            tg.sendData(JSON.stringify({ action: "ask_question", subject: subject, question: question}));
         });
-
-        // Отправка темы и вопроса через Telegram Web App API
-        tg.sendData(JSON.stringify({ action: "ask_question", subject: subject, question: question }));
-
-
-        });
-
-
 
         tg.onEvent('web_app_data', function(data) {
             const parsedData = JSON.parse(data);
