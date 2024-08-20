@@ -392,13 +392,27 @@
 
         const formData = new FormData();
 
+         const params = new URLSearchParams(window.location.search);
+            formData.append('action', 'ask_question');
+            formData.append('subject', subject);
+            formData.append('question', question);
+            formData.append('username', params.get('username'));
+            formData.append('first_name', params.get('first_name'));
+            formData.append('last_name', params.get('last_name'));
+            formData.append('user_id', params.get('user_id'));
+
         if (fileInput) {
+            formData.append('file_name', fileInput.name);
             formData.append('file', fileInput);
         }
 
+         for (let [key, value] of formData.entries()) {
+                console.log('formData',`${key}: ${value}`);
+            }
+
 
         // Отправка файла на сервер
-         fetch('https://0fe4-212-116-96-98.ngrok-free.app/upload_file', {
+         fetch('https://827b-212-116-96-98.ngrok-free.app/upload_file', {
             method: 'POST',
             body: formData,
           })
@@ -419,7 +433,7 @@
 
             // Отправка темы и вопроса через Telegram Web App API
             tg.sendData(JSON.stringify({ action: "ask_question", subject: subject, question: question}));
-        });
+            });
 
         tg.onEvent('web_app_data', function(data) {
             const parsedData = JSON.parse(data);

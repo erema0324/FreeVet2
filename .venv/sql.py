@@ -1,6 +1,7 @@
 import sqlite3
 import time
 
+
 def drop_all_table(db_name):
     conn = sqlite3.connect(db_name)
     c = conn.cursor()
@@ -16,6 +17,8 @@ def drop_all_table(db_name):
     conn.commit()
     conn.close()
     init_db()
+
+
 def init_db():
     try:
         with sqlite3.connect('users.db') as conn:
@@ -58,56 +61,6 @@ def init_db():
     except sqlite3.Error as e:
         print(f"Error initializing database: {e}")
 
-def save_file_to_db(file):
-    try:
-        file_data = file.read()
-        file_name = file.filename
-
-        time.sleep(10)
-
-        with sqlite3.connect('users.db') as conn:
-            cursor = conn.cursor()
-
-            # Проверка наличия строк в таблице
-            cursor.execute('''
-                SELECT COUNT(*) FROM requests
-            ''')
-            row_count = cursor.fetchone()[0]
-
-            if row_count == 0:
-                print("Error: The table is empty. No rows to update.")
-                drop_all_tables('users.db')
-
-                return False
-
-            # Найти ID последней строки
-            cursor.execute('''
-                SELECT id FROM requests
-                ORDER BY id DESC
-                LIMIT 1
-            ''')
-            last_record = cursor.fetchone()
-
-            if not last_record:
-                print("Error: No records found in the table.")
-                return False
-
-            last_record_id = last_record[0]
-
-            # Обновление последней строки
-            cursor.execute('''
-                UPDATE requests
-                SET file_name = ?, file_data = ?
-                WHERE id = ?
-            ''', (file_name, file_data, last_record_id))
-            conn.commit()
-
-        print("Last record updated successfully.")
-        return True
-    except sqlite3.Error as e:
-        print(f"Error updating the last record in the database: {e}")
-        return False
-
 
 def save_user(user_data):
     try:
@@ -120,6 +73,7 @@ def save_user(user_data):
         print("User saved successfully.")
     except sqlite3.Error as e:
         print(f"Error saving user: {e}")
+
 
 def get_user(user_id):
     try:
@@ -136,6 +90,7 @@ def get_user(user_id):
         print(f"Error retrieving user: {e}")
         return None
 
+
 def get_user_stats(user_id):
     try:
         with sqlite3.connect('users.db') as conn:
@@ -149,17 +104,20 @@ def get_user_stats(user_id):
         print(f"Error retrieving user stats: {e}")
         return {"donations": 0, "requests": 0}
 
-def save_question(user_id, subject, question):
+
+def save_question(user_id, subject, question, file_name=None, file_data=None):
     try:
         with sqlite3.connect('users.db') as conn:
             cursor = conn.cursor()
             cursor.execute('''
-                INSERT INTO requests (user_id, subject, request, status, date)
-                VALUES (?, ?, ?, ?, datetime('now'))
-            ''', (user_id, subject, question, 'pending'))
-        print("Question saved successfully.")
+                INSERT INTO requests (user_id, subject, request, status, date, file_name, file)
+                VALUES (?, ?, ?, ?, datetime('now'), ?, ?)
+            ''', (user_id, subject, question, 'pending', file_name, file_data))
+            conn.commit()  # Не забудьте зафиксировать транзакцию
+        print("Question and file saved successfully.")
     except sqlite3.Error as e:
-        print(f"Error saving question: {e}")
+        print(f"Error saving question and file: {e}")
+
 
 def get_user_questions(user_id):
     try:
@@ -172,6 +130,7 @@ def get_user_questions(user_id):
     except sqlite3.Error as e:
         print(f"Error retrieving user questions: {e}")
         return []
+
 
 if __name__ == "__main__":
     init_db()
