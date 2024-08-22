@@ -7,7 +7,6 @@ import sqlite3
 from sql import save_user, get_user, save_question, get_user_questions, init_db
 import time
 
-
 API_TOKEN = '7214821564:AAGbG3JJyObd3cF8UNbMNibGSIxz_QMiZTU'
 
 logging.basicConfig(level=logging.INFO)
@@ -16,10 +15,14 @@ logger = logging.getLogger(__name__)
 bot = telebot.TeleBot(API_TOKEN)
 
 
+def create_bot(api_token):
+    return telebot.TeleBot(api_token)
+
+
 def webAppKeyboard(user_id, username, first_name, last_name):
     keyboard = types.ReplyKeyboardMarkup(row_width=1)
     webAppTest = types.WebAppInfo(
-        f"https://827b-212-116-96-98.ngrok-free.app/webapp.html?user_id={user_id}&username={username}&first_name={first_name}&last_name={last_name}")
+        f"https://4e21-212-116-96-98.ngrok-free.app/webapp.html?user_id={user_id}&username={username}&first_name={first_name}&last_name={last_name}")
     one_butt = types.KeyboardButton(text="Open Web App", web_app=webAppTest)
     keyboard.add(one_butt)
     return keyboard
@@ -44,61 +47,6 @@ def send_welcome(message):
                          reply_markup=webAppKeyboard(user.id, user.username, user.username, user.last_name))
     else:
         bot.send_message(message.chat.id, 'Hello! User data not found.')
-
-
-# @bot.message_handler(content_types="web_app_data")
-# def answer(webAppMes):
-#     logger.info("Received web app data:")
-#     logger.info(f"Full message: {webAppMes}")
-#     logger.info(f"Data from web app: {webAppMes.web_app_data.data}")
-#
-#     data = webAppMes.web_app_data.data
-#     print(data)
-#
-#     if data:
-#         try:
-#             event_data = json.loads(data)
-#             event = event_data.get("action")
-#             user_id = webAppMes.from_user.id
-#             query_id = webAppMes.web_app_data.query_id if hasattr(webAppMes.web_app_data, 'query_id') else None
-#
-#             if event == "ask_question":
-#                 subject = event_data.get("subject")
-#                 question = event_data.get("question")
-#
-#                 try:
-#                     save_question(user_id, subject, question)
-#                     if query_id:
-#                         bot.answer_web_app_query(query_id,
-#                                                  json.dumps({"action": "question_received", "status": "success"}))
-#                     bot.send_message(user_id, "Ваш вопрос успешно отправлен ветеринарному врачу.")
-#
-#                 except Exception as e:
-#                     if query_id:
-#                         bot.answer_web_app_query(query_id, json.dumps({"action": "question_error", "status": "error"}))
-#                     logger.error(f"Error saving question: {e}")
-#                     bot.send_message(user_id,
-#                                      "Произошла ошибка при отправке вашего вопроса. Пожалуйста, попробуйте еще раз.")
-#
-#             elif event == "get_my_questions":
-#                 try:
-#                     user_questions = get_user_questions(user_id)
-#                     if query_id:
-#                         bot.answer_web_app_query(query_id,
-#                                                  json.dumps({"action": "profile_data", "data": user_questions}))
-#                 except Exception as e:
-#                     logger.error(f"Error retrieving user questions: {e}")
-#                     if query_id:
-#                         bot.answer_web_app_query(query_id, json.dumps({"action": "question_error", "status": "error"}))
-#
-#             elif event == "donate":
-#                 amount = event_data.get("amount")
-#                 if query_id:
-#                     bot.answer_web_app_query(query_id, json.dumps({"action": "donate", "status": "success"}))
-#
-#             logger.info(f"Event: {event}")
-#         except Exception as e:
-#             logger.error(f"Error parsing web app data: {e}")
 
 
 if __name__ == "__main__":

@@ -51,11 +51,20 @@ def init_db():
                     request TEXT,
                     status TEXT,
                     date TEXT,
-                    file_name TEXT,
-                    file_data BLOB,
                     FOREIGN KEY(user_id) REFERENCES users(id)
                 )
             ''')
+
+            cursor.execute('''
+                       CREATE TABLE IF NOT EXISTS request_files (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        request_id INTEGER,
+                        user_id INTEGER,
+                        file_name TEXT,
+                        file_data BLOB,
+                        FOREIGN KEY(request_id) REFERENCES requests(id)
+                       )
+                   ''')
 
         print("Database initialized successfully.")
     except sqlite3.Error as e:
@@ -105,18 +114,29 @@ def get_user_stats(user_id):
         return {"donations": 0, "requests": 0}
 
 
-def save_question(user_id, subject, question, file_name=None, file_data=None):
+def save_question(user_id, subject, question, file_data=None):
     try:
         with sqlite3.connect('users.db') as conn:
             cursor = conn.cursor()
+
             cursor.execute('''
-                INSERT INTO requests (user_id, subject, request, status, date, file_name, file)
-                VALUES (?, ?, ?, ?, datetime('now'), ?, ?)
-            ''', (user_id, subject, question, 'pending', file_name, file_data))
-            conn.commit()  # Не забудьте зафиксировать транзакцию
-        print("Question and file saved successfully.")
+                INSERT INTO requests(user_id, subject, request, status, date)
+                VALUES (?, ?, ?, ?, datetime('now'))
+            ''', (user_id, subject, question, 'pending'))
+
+            request_id = cursor.lastrowid
+
+            if file_data:
+                for file_name, file_blob in file_data:
+                    cursor.execute('''
+                        INSERT INTO request_files(request_id, user_id, file_name, file_data)
+                        VALUES (?, ?, ?, ?)
+                    ''', (request_id, user_id, file_name, file_blob))
+
+            conn.commit()
+        print("Question and files saved successfully.")
     except sqlite3.Error as e:
-        print(f"Error saving question and file: {e}")
+        print(f"Error saving question and files: {e}")
 
 
 def get_user_questions(user_id):

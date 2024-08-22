@@ -380,39 +380,33 @@
         document.getElementById('submitQuestionButton').addEventListener('click', function(event) {
         const subject = document.getElementById('requestSubject').value.trim();
         const question = document.getElementById('questionText').value.trim();
-        const fileInput = document.getElementById('fileInput').files[0];
-
-
+        const fileInput = document.getElementById('fileInput').files;
 
         if (!subject || !question) {
         alert('Пожалуйста, заполните тему запроса и сообщение.');
         return;
         }
 
-
         const formData = new FormData();
 
          const params = new URLSearchParams(window.location.search);
-            formData.append('action', 'ask_question');
+
+            formData.append('user_id', params.get('user_id'));
             formData.append('subject', subject);
             formData.append('question', question);
-            formData.append('username', params.get('username'));
-            formData.append('first_name', params.get('first_name'));
-            formData.append('last_name', params.get('last_name'));
-            formData.append('user_id', params.get('user_id'));
 
         if (fileInput) {
-            formData.append('file_name', fileInput.name);
-            formData.append('file', fileInput);
+            for (let i = 0; i < fileInput.length; i++) {
+            formData.append('files[]', fileInput[i]); // Используем 'files[]' для отправки нескольких файлов
+        }
         }
 
          for (let [key, value] of formData.entries()) {
                 console.log('formData',`${key}: ${value}`);
             }
 
-
         // Отправка файла на сервер
-         fetch('https://827b-212-116-96-98.ngrok-free.app/upload_file', {
+         fetch('https://4e21-212-116-96-98.ngrok-free.app/upload_question', {
             method: 'POST',
             body: formData,
           })
