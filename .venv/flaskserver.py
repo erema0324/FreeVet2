@@ -6,15 +6,14 @@ from sql import init_db, save_question
 import logging
 from vetbot import create_bot
 
-API_TOKEN = '7214821564:AAGbG3JJyObd3cF8UNbMNibGSIxz_QMiZTU'
-bot = create_bot(API_TOKEN)
+# API_TOKEN = '7214821564:AAGbG3JJyObd3cF8UNbMNibGSIxz_QMiZTU'
+# bot = create_bot(API_TOKEN)
 
 app = Flask(__name__)
 CORS(app)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
 
 @app.route('/webapp.html')
 def render_templ():
@@ -38,11 +37,11 @@ def upload_file():
     try:
 
         save_question(user_id, subject, question, file_data)
-        bot.send_message(user_id, "Ваш вопрос успешно отправлен ветеринарному врачу.")
+        # bot.send_message(user_id, "Ваш вопрос успешно отправлен ветеринарному врачу.")
         return jsonify({"message": "File and question saved successfully!"}), 200
 
     except Exception as e:
-        bot.send_message(user_id, "Произошла ошибка при отправке вашего вопроса. Пожалуйста, попробуйте еще раз.")
+        # bot.send_message(user_id, "Произошла ошибка при отправке вашего вопроса. Пожалуйста, попробуйте еще раз.")
         logger.info({"error": f"Error saving data: {e}"})
         return jsonify({"error": f"Error saving data: {e}"}), 500
 

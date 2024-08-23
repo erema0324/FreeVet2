@@ -22,7 +22,7 @@ def create_bot(api_token):
 def webAppKeyboard(user_id, username, first_name, last_name):
     keyboard = types.ReplyKeyboardMarkup(row_width=1)
     webAppTest = types.WebAppInfo(
-        f"https://4e21-212-116-96-98.ngrok-free.app/webapp.html?user_id={user_id}&username={username}&first_name={first_name}&last_name={last_name}")
+        f"https://da911c8a0176c09e8a9ad1ceaab7de25.serveo.net/webapp.html?user_id={user_id}&username={username}&first_name={first_name}&last_name={last_name}")
     one_butt = types.KeyboardButton(text="Open Web App", web_app=webAppTest)
     keyboard.add(one_butt)
     return keyboard
